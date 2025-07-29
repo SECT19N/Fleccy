@@ -1,0 +1,39 @@
+<Window
+    x:Class="Fleccy.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prims="using:FluentAvalonia.UI.Controls.Primitives"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="using:Fleccy.ViewModels"
+    Title="Fleccy"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainWindowViewModel"
+    Icon="/Assets/avalonia-logo.ico"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <!--
+            This only sets the DataContext for the previewer in an IDE,
+            to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs)
+        -->
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <ui:NavigationView
+        IsPaneOpen="{Binding IsPaneOpen}"
+        OpenPaneLength="180"
+        PaneTitle="Fleccy"
+        SelectionChanged="NavigationView_SelectionChanged">
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Content="CPU" Tag="Cpu" />
+            <ui:NavigationViewItem Content="Storage" Tag="Storage" />
+        </ui:NavigationView.MenuItems>
+
+        <ui:NavigationView.Content>
+            <ui:Frame Content="{Binding CurrentView}" />
+        </ui:NavigationView.Content>
+    </ui:NavigationView>
+</Window>
