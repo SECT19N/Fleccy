@@ -23,6 +23,9 @@ public partial class MainWindow : AppWindow {
 				case "Memory":
 					vm.NavigateMemory();
 					break;
+				case "Battery":
+					vm.NavigateBattery();
+					break;
 			}
 		}
 	}

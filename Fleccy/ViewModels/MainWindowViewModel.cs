@@ -39,6 +39,13 @@ public partial class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
 		Debug.WriteLine("Navigated to Memory Page");
 	}
 
+	public void NavigateBattery() {
+		CurrentView = new BatteryPage {
+			DataContext = new BatteryViewModel()
+		};
+		Debug.WriteLine("Navigated to Battery Page");
+	}
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 	protected virtual void OnPropertyChanged(string propertyName) =>
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
