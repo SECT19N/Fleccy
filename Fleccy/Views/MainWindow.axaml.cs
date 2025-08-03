@@ -20,6 +20,9 @@ public partial class MainWindow : AppWindow {
 				case "Storage":
 					vm.NavigateStorage();
 					break;
+				case "Memory":
+					vm.NavigateMemory();
+					break;
 			}
 		}
 	}

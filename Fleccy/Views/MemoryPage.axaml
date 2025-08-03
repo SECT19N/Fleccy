@@ -1,24 +1,24 @@
 <UserControl
-    x:Class="Fleccy.StoragePage"
+    x:Class="Fleccy.MemoryPage"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:Fleccy.ViewModels"
+    xmlns:vm="using:Fleccy.ViewModels"
     Margin="12"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:CompileBindings="True"
-    x:DataType="vm:StorageViewModel"
+    x:DataType="vm:MemoryViewModel"
     mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:StorageViewModel />
+        <vm:MemoryViewModel />
     </Design.DataContext>
 
-    <TreeView ItemsSource="{Binding DriveNodes}">
+    <TreeView ItemsSource="{Binding MemoryNodes}">
         <TreeView.ItemTemplate>
-            <TreeDataTemplate x:DataType="vm:DriveTreeNode" ItemsSource="{Binding Children}">
+            <TreeDataTemplate x:DataType="vm:MemoryTreeNode" ItemsSource="{Binding Children}">
                 <TextBlock Text="{Binding Name}" />
             </TreeDataTemplate>
         </TreeView.ItemTemplate>

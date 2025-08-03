@@ -32,6 +32,13 @@ public partial class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
 		Debug.WriteLine("Navigated to Storage Page");
 	}
 
+	public void NavigateMemory() {
+		CurrentView = new MemoryPage {
+			DataContext = new MemoryViewModel()
+		};
+		Debug.WriteLine("Navigated to Memory Page");
+	}
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 	protected virtual void OnPropertyChanged(string propertyName) =>
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

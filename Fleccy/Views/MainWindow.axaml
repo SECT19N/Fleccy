@@ -30,6 +30,7 @@
         <ui:NavigationView.MenuItems>
             <ui:NavigationViewItem Content="CPU" Tag="Cpu" />
             <ui:NavigationViewItem Content="Storage" Tag="Storage" />
+            <ui:NavigationViewItem Content="Memory" Tag="Memory" />
         </ui:NavigationView.MenuItems>
 
         <ui:NavigationView.Content>
