@@ -28,6 +28,7 @@
         PaneTitle="Fleccy"
         SelectionChanged="NavigationView_SelectionChanged">
         <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Content="System" Tag="System" />
             <ui:NavigationViewItem Content="CPU" Tag="Cpu" />
             <ui:NavigationViewItem Content="Storage" Tag="Storage" />
             <ui:NavigationViewItem Content="Memory" Tag="Memory" />

@@ -2,8 +2,8 @@ using Avalonia.Controls;
 
 namespace Fleccy;
 
-public partial class BatteryPage : UserControl {
-	public BatteryPage() {
+public partial class SystemPage : UserControl {
+	public SystemPage() {
 		InitializeComponent();
 	}
 }

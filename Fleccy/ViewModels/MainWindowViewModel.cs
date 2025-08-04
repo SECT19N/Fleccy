@@ -6,7 +6,7 @@ namespace Fleccy.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged {
 	public bool IsPaneOpen { get; set; } = true;
 
-	private object _currentView = new CpuPage { DataContext = new CpuViewModel() };
+	private object _currentView = new SystemPage { DataContext = new SystemViewModel() };
 
 	public object CurrentView {
 		get => _currentView;
@@ -44,6 +44,13 @@ public partial class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
 			DataContext = new BatteryViewModel()
 		};
 		Debug.WriteLine("Navigated to Battery Page");
+	}
+
+	public void NavigateSystem() {
+		CurrentView = new SystemPage {
+			DataContext = new SystemViewModel()
+		};
+		Debug.WriteLine("Navigated to System Page");
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;

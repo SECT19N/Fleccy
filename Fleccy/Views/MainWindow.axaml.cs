@@ -14,6 +14,9 @@ public partial class MainWindow : AppWindow {
 			string? tag = (e.SelectedItem as NavigationViewItem)?.Tag?.ToString();
 
 			switch (tag) {
+				case "System":
+					vm.NavigateSystem();
+					break;
 				case "Cpu":
 					vm.NavigateCpu();
 					break;

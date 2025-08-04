@@ -1,10 +1,5 @@
 ﻿using Hardware.Info;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fleccy.ViewModels;
 
@@ -19,6 +14,7 @@ public class BatteryViewModel : ViewModelBase {
 
 	private void LoadBatteryData() {
 		_hardwareInfo.RefreshBatteryList();
+
 		foreach (Battery battery in _hardwareInfo.BatteryList) {
 			BatteryTreeNode batteryNode = new() { Name = $"{battery.TimeOnBattery}" };
 
@@ -27,7 +23,7 @@ public class BatteryViewModel : ViewModelBase {
 			batteryNode.Children.Add(new() { Name = $"Design Capacity: {battery.DesignCapacity} mWh" });
 			batteryNode.Children.Add(new() { Name = $"Full Charge Capacity: {battery.FullChargeCapacity} mWh" });
 			batteryNode.Children.Add(new() { Name = $"Cycle Count: {battery.ExpectedLife}" });
-			
+
 			BatteryNodes.Add(batteryNode);
 		}
 	}
