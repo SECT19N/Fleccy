@@ -3,6 +3,7 @@ using FluentAvalonia.UI.Controls;
 using Hardware.Info;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,11 @@ namespace Fleccy.ViewModels;
 
 public class MemoryViewModel : ViewModelBase {
 	private readonly HardwareInfo _hardwareInfo = new();
-	private MemoryTreeNode? _availablePhysicalNode, _availableVirtualNode, _availablePageNode;
+
+	// Nodes we'll update dynamically
+	private MemoryTreeNode? _availablePhysicalNode;
+	private MemoryTreeNode? _availableVirtualNode;
+	private MemoryTreeNode? _availablePageFileNode;
 
 	private CancellationTokenSource? _refreshCts;
 
@@ -19,59 +24,65 @@ public class MemoryViewModel : ViewModelBase {
 
 	public MemoryViewModel() {
 		LoadMemoryData();
-
 		StartAutoRefresh();
 	}
 
 	private void LoadMemoryData() {
+		MemoryNodes.Clear();
 		_hardwareInfo.RefreshMemoryStatus();
-
-		// Interesting value here.
-		ulong totalVirtualMem = _hardwareInfo.MemoryStatus.TotalVirtual;
-		ulong availableVirtual = _hardwareInfo.MemoryStatus.AvailableVirtual;
-
-		ulong totalPageFile = _hardwareInfo.MemoryStatus.TotalPageFile;
-		ulong availablePageFile = _hardwareInfo.MemoryStatus.AvailablePageFile;
 
 		ulong totalPhysical = _hardwareInfo.MemoryStatus.TotalPhysical;
 		ulong availablePhysical = _hardwareInfo.MemoryStatus.AvailablePhysical;
 
+		ulong totalPageFile = _hardwareInfo.MemoryStatus.TotalPageFile;
+		ulong availablePageFile = _hardwareInfo.MemoryStatus.AvailablePageFile;
+
+		// Total Virtual Memory is Physical + PageFile
+		ulong totalVirtual = totalPhysical + totalPageFile;
+		ulong availableVirtual = _hardwareInfo.MemoryStatus.AvailableVirtual;
+
+
 		MemoryNodes.Add(new("Memory Status") {
 			Children = [
-				new($"Total Virtual Memory: {totalVirtualMem / 1024 / 1024 / 1024:N0} GB"),
-				_availableVirtualNode = new($"Available Virtual Memory: {availableVirtual / 1024 / 1024 / 1024:N0} GB"),
-				new($"Total Page File: {totalPageFile / 1024 / 1024:N0} MB"),
-				_availablePageNode = new($"Available Page File: {availablePageFile / 1024 / 1024:N0} MB"),
 				new($"Total Physical Memory: {totalPhysical / 1024 / 1024:N0} MB"),
-				_availablePhysicalNode = new($"Available Physical Memory: {availablePhysical / 1024 / 1024:N0} MB")
+				_availablePhysicalNode = new($"Available Physical Memory: {availablePhysical / 1024 / 1024:N0} MB"),
+
+				new($"Total Page File (Swap): {totalPageFile / 1024 / 1024:N0} MB"),
+				_availablePageFileNode = new($"Available Page File: {availablePageFile / 1024 / 1024:N0} MB"),
+
+				new($"Total Virtual Memory (RAM + Page File): {totalVirtual / 1024 / 1024:N0} MB"),
+				_availableVirtualNode = new($"Available Virtual Memory: {availableVirtual / 1024 / 1024:N0} MB")
 			]
 		});
 
 		_hardwareInfo.RefreshMemoryList();
 
-		// you never know...
 		if (_hardwareInfo.MemoryList.Count == 0) {
-			MemoryNodes.Add(new MemoryTreeNode("No memory information available."));
+			MemoryNodes.Add(new("No memory module information available."));
 			return;
-		} else {
-			MemoryTreeNode memoryRootNode = new("Memory Modules: ");
-
-			foreach (Memory memory in _hardwareInfo.MemoryList) {
-				MemoryTreeNode memoryNode = new($"Bank: {memory.BankLabel}");
-
-				memoryNode.Children.Add(new($"Size: {memory.Capacity / 1024 / 1024:N0} MB"));
-				memoryNode.Children.Add(new($"Speed: {memory.Speed:N0} MHz"));
-				memoryNode.Children.Add(new($"Manufacturer: {memory.Manufacturer}"));
-				memoryNode.Children.Add(new($"Serial Number: {memory.SerialNumber}"));
-				memoryNode.Children.Add(new($"Part Number: {memory.PartNumber}"));
-				memoryNode.Children.Add(new($"Form Factor: {memory.FormFactor}"));
-				memoryNode.Children.Add(new($"Min/Max Voltage (in mV): {(memory.MinVoltage == 0 ? "N/A" : memory.MinVoltage)} / {(memory.MaxVoltage == 0 ? "N/A" : memory.MaxVoltage)}"));
-
-				memoryRootNode.Children.Add(memoryNode);
-			}
-
-			MemoryNodes.Add(memoryRootNode);
 		}
+
+		MemoryTreeNode memoryModulesNode = new("Memory Modules:");
+
+		foreach (Memory memory in _hardwareInfo.MemoryList) {
+			MemoryTreeNode memoryNode = new($"Bank: {memory.BankLabel}");
+
+			memoryNode.Children.Add(new($"Size: {memory.Capacity / 1024 / 1024:N0} MB"));
+			memoryNode.Children.Add(new($"Speed: {memory.Speed:N0} MHz"));
+			memoryNode.Children.Add(new($"Manufacturer: {memory.Manufacturer}"));
+			memoryNode.Children.Add(new($"Serial Number: {memory.SerialNumber}"));
+			memoryNode.Children.Add(new($"Part Number: {memory.PartNumber}"));
+			memoryNode.Children.Add(new($"Form Factor: {memory.FormFactor}"));
+			memoryNode.Children.Add(new (
+				$"Min/Max Voltage (in mV): " +
+				$"{(memory.MinVoltage == 0 ? "N/A" : memory.MinVoltage)}" +
+				$" / " +
+				$"{(memory.MaxVoltage == 0 ? "N/A" : memory.MaxVoltage)}"));
+
+			memoryModulesNode.Children.Add(memoryNode);
+		}
+
+		MemoryNodes.Add(memoryModulesNode);
 	}
 
 	private async void StartAutoRefresh() {
@@ -79,17 +90,17 @@ public class MemoryViewModel : ViewModelBase {
 
 		try {
 			while (!_refreshCts.Token.IsCancellationRequested) {
-				await Dispatcher.UIThread.InvokeAsync(() => UpdateMemoryData());
-
+				await Dispatcher.UIThread.InvokeAsync(UpdateMemoryData);
 				await Task.Delay(1000, _refreshCts.Token);
 			}
 		} catch (TaskCanceledException ex) {
-			// todo - Graceful cancellation
 			ContentDialog contentDialog = new() {
 				Title = "Auto Refresh Stopped",
-				Content = $"The auto-refresh task was cancelled: {ex.Message}",
+				Content = $"The memory auto-refresh has been stopped. Reason: {ex.Message}",
 				CloseButtonText = "OK"
 			};
+
+			Debug.WriteLine($"Auto-refresh stopped: {ex.StackTrace}");
 
 			await contentDialog.ShowAsync();
 		}
@@ -102,29 +113,28 @@ public class MemoryViewModel : ViewModelBase {
 	private void UpdateMemoryData() {
 		_hardwareInfo.RefreshMemoryStatus();
 
-		ulong availableVirtual = _hardwareInfo.MemoryStatus.AvailableVirtual;
-		ulong availablePageFile = _hardwareInfo.MemoryStatus.AvailablePageFile;
 		ulong availablePhysical = _hardwareInfo.MemoryStatus.AvailablePhysical;
+		ulong availablePageFile = _hardwareInfo.MemoryStatus.AvailablePageFile;
+		ulong availableVirtual = _hardwareInfo.MemoryStatus.AvailableVirtual;
 
-		if (_availableVirtualNode != null)
-			_availableVirtualNode.Name = $"Available Virtual Memory: {availableVirtual / 1024 / 1024 / 1024:N0} GB";
-
-		if (_availablePageNode != null)
-			_availablePageNode.Name = $"Available Page File: {availablePageFile / 1024 / 1024:N0} MB";
-		
 		if (_availablePhysicalNode != null)
 			_availablePhysicalNode.Name = $"Available Physical Memory: {availablePhysical / 1024 / 1024:N0} MB";
+
+		if (_availablePageFileNode != null)
+			_availablePageFileNode.Name = $"Available Page File: {availablePageFile / 1024 / 1024:N0} MB";
+
+		if (_availableVirtualNode != null)
+			_availableVirtualNode.Name = $"Available Virtual Memory: {availableVirtual / 1024 / 1024:N0} MB";
 	}
 }
 
+// MemoryTreeNode with INotifyPropertyChanged for dynamic UI updates
 public class MemoryTreeNode(string name) : INotifyPropertyChanged {
-	private string _name = name;
-
 	public string Name {
-		get => _name;
+		get => name;
 		set {
-			if (_name != value) {
-				_name = value;
+			if (name != value) {
+				name = value;
 				OnPropertyChanged();
 			}
 		}
@@ -135,5 +145,5 @@ public class MemoryTreeNode(string name) : INotifyPropertyChanged {
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-		=> PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		=> PropertyChanged?.Invoke(this, new(propertyName));
 }
