@@ -109,11 +109,11 @@ public class MemoryViewModel : ViewModelBase {
 		if (_availableVirtualNode != null)
 			_availableVirtualNode.Name = $"Available Virtual Memory: {availableVirtual / 1024 / 1024 / 1024:N0} GB";
 
+		if (_availablePageNode != null)
+			_availablePageNode.Name = $"Available Page File: {availablePageFile / 1024 / 1024:N0} MB";
+		
 		if (_availablePhysicalNode != null)
 			_availablePhysicalNode.Name = $"Available Physical Memory: {availablePhysical / 1024 / 1024:N0} MB";
-
-		if (_availablePageNode != null)
-			_availablePageNode.Name = $"Available Physical Memory: {availablePageFile / 1024 / 1024:N0} MB";
 	}
 }
 
