@@ -130,7 +130,7 @@ public class MemoryTreeNode(string name) : INotifyPropertyChanged {
 		}
 	}
 
-	public ObservableCollection<MemoryTreeNode> Children { get; set; } = new();
+	public ObservableCollection<MemoryTreeNode> Children { get; set; } = [];
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
