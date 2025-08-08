@@ -36,7 +36,7 @@ public class MemoryViewModel : ViewModelBase {
 		ulong totalPhysical = _hardwareInfo.MemoryStatus.TotalPhysical;
 		ulong availablePhysical = _hardwareInfo.MemoryStatus.AvailablePhysical;
 
-		MemoryNodes.Add(new MemoryTreeNode("Memory Status") {
+		MemoryNodes.Add(new("Memory Status") {
 			Children = [
 				new($"Total Virtual Memory: {totalVirtualMem / 1024 / 1024 / 1024:N0} GB"),
 				_availableVirtualNode = new($"Available Virtual Memory: {availableVirtual / 1024 / 1024 / 1024:N0} GB"),
