@@ -1,10 +1,9 @@
 ﻿using Avalonia.Threading;
+using Fleccy.Models;
 using FluentAvalonia.UI.Controls;
 using Hardware.Info;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,14 +12,13 @@ namespace Fleccy.ViewModels;
 public class MemoryViewModel : ViewModelBase {
 	private readonly HardwareInfo _hardwareInfo = new();
 
-	// Nodes we'll update dynamically
-	private MemoryTreeNode? _availablePhysicalNode;
-	private MemoryTreeNode? _availableVirtualNode;
-	private MemoryTreeNode? _availablePageFileNode;
+	private TreeNode? _availablePhysicalNode;
+	private TreeNode? _availableVirtualNode;
+	private TreeNode? _availablePageFileNode;
 
 	private CancellationTokenSource? _refreshCts;
 
-	public ObservableCollection<MemoryTreeNode> MemoryNodes { get; } = [];
+	public ObservableCollection<TreeNode> MemoryNodes { get; } = [];
 
 	public MemoryViewModel() {
 		LoadMemoryData();
@@ -28,7 +26,6 @@ public class MemoryViewModel : ViewModelBase {
 	}
 
 	private void LoadMemoryData() {
-		MemoryNodes.Clear();
 		_hardwareInfo.RefreshMemoryStatus();
 
 		ulong totalPhysical = _hardwareInfo.MemoryStatus.TotalPhysical;
@@ -62,10 +59,10 @@ public class MemoryViewModel : ViewModelBase {
 			return;
 		}
 
-		MemoryTreeNode memoryModulesNode = new("Memory Modules:");
+		TreeNode memoryModulesNode = new("Memory Modules:");
 
 		foreach (Memory memory in _hardwareInfo.MemoryList) {
-			MemoryTreeNode memoryNode = new($"Bank: {memory.BankLabel}");
+			TreeNode memoryNode = new($"Bank: {memory.BankLabel}");
 
 			memoryNode.Children.Add(new($"Size: {memory.Capacity / 1024 / 1024:N0} MB"));
 			memoryNode.Children.Add(new($"Speed: {memory.Speed:N0} MHz"));
@@ -73,7 +70,7 @@ public class MemoryViewModel : ViewModelBase {
 			memoryNode.Children.Add(new($"Serial Number: {memory.SerialNumber}"));
 			memoryNode.Children.Add(new($"Part Number: {memory.PartNumber}"));
 			memoryNode.Children.Add(new($"Form Factor: {memory.FormFactor}"));
-			memoryNode.Children.Add(new (
+			memoryNode.Children.Add(new(
 				$"Min/Max Voltage (in mV): " +
 				$"{(memory.MinVoltage == 0 ? "N/A" : memory.MinVoltage)}" +
 				$" / " +
@@ -126,24 +123,4 @@ public class MemoryViewModel : ViewModelBase {
 		if (_availableVirtualNode != null)
 			_availableVirtualNode.Name = $"Available Virtual Memory: {availableVirtual / 1024 / 1024:N0} MB";
 	}
-}
-
-// MemoryTreeNode with INotifyPropertyChanged for dynamic UI updates
-public class MemoryTreeNode(string name) : INotifyPropertyChanged {
-	public string Name {
-		get => name;
-		set {
-			if (name != value) {
-				name = value;
-				OnPropertyChanged();
-			}
-		}
-	}
-
-	public ObservableCollection<MemoryTreeNode> Children { get; set; } = [];
-
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-		=> PropertyChanged?.Invoke(this, new(propertyName));
 }

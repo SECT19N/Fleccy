@@ -3,7 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Fleccy.ViewModels"
+    xmlns:m="using:Fleccy.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:Fleccy.ViewModels"
     Margin="12"
@@ -19,7 +19,7 @@
 
     <TreeView ItemsSource="{Binding CpuNodes}">
         <TreeView.ItemTemplate>
-            <TreeDataTemplate x:DataType="local:CpuTreeNode" ItemsSource="{Binding Children}">
+            <TreeDataTemplate x:DataType="m:TreeNode" ItemsSource="{Binding Children}">
                 <TextBlock Text="{Binding Name}" />
             </TreeDataTemplate>
         </TreeView.ItemTemplate>
