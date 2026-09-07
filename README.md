@@ -29,3 +29,7 @@ assets/
 ```
 cargo run
 ```
+
+## License
+
+GPL-3.0-or-later. See [LICENSE](LICENSE).

@@ -3,7 +3,7 @@ name = "fleccy"
 version = "0.1.0"
 edition = "2021"
 description = "A Speccy-like hardware monitor built with Slint and Fluent UI design principles"
-license = "MIT"
+license = "GPL-3.0-or-later"
 
 [dependencies]
 slint = "1"
