@@ -1,0 +1,12 @@
+[package]
+name = "fleccy"
+version = "0.1.0"
+edition = "2021"
+description = "A Speccy-like hardware monitor built with Slint and Fluent UI design principles"
+license = "MIT"
+
+[dependencies]
+slint = "1"
+
+[build-dependencies]
+slint-build = "1"
